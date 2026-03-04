@@ -9,14 +9,17 @@ import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
 import com.liwo.habits.util.AppLogger
 import com.liwo.habits.util.DateUtil
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 data class DashboardState(
     val date: String,
+    val selectedDate: String,
     val pointsAvailable: Int,
     val dayTotal: Int,
     val daily: DailyState
@@ -29,6 +32,13 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
 
     private val today = DateUtil.today()
 
+    private val _selectedDate = MutableStateFlow(today)
+    val selectedDate: StateFlow<String> = _selectedDate
+
+    fun prevDay() { _selectedDate.value = DateUtil.addDays(_selectedDate.value, -1) }
+    fun nextDay() { _selectedDate.value = DateUtil.addDays(_selectedDate.value, 1) }
+    fun goToday() { _selectedDate.value = today }
+
     private val pointsAvailableFlow =
         combine(
             db.habitLogDao().observeTotalPointsEarned(),
@@ -39,10 +49,10 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
             e - s
         }
 
-    private val dailyFlow = repo.observeDailyState(today)
+    private val dailyFlow = _selectedDate.flatMapLatest { repo.observeDailyState(it) }
 
     val state: StateFlow<DashboardState> =
-        combine(pointsAvailableFlow, dailyFlow) { available, daily ->
+        combine(pointsAvailableFlow, dailyFlow, _selectedDate) { available, daily, date ->
 
             val dayTotal = daily.habits.sumOf {
                 when (it.status) {
@@ -53,7 +63,8 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
             }
 
             DashboardState(
-                date = today,
+                date = date,
+                selectedDate = date,
                 pointsAvailable = available,
                 dayTotal = dayTotal,
                 daily = daily
@@ -63,6 +74,7 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
             SharingStarted.WhileSubscribed(5_000),
             DashboardState(
                 date = today,
+                selectedDate = today,
                 pointsAvailable = 0,
                 dayTotal = 0,
                 daily = DailyState(emptyList())
@@ -70,9 +82,10 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
         )
 
     fun setStatus(habitId: Long, status: HabitStatus) {
+        val date = _selectedDate.value
         viewModelScope.launch {
-            repo.setStatus(habitId = habitId, date = today, status = status)
-            AppLogger.i("Dashboard", "Status set: habit=$habitId status=$status date=$today")
+            repo.setStatus(habitId = habitId, date = date, status = status)
+            AppLogger.i("Dashboard", "Status set: habit=$habitId status=$status date=$date")
         }
     }
 }

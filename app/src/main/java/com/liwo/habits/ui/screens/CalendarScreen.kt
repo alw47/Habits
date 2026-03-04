@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -37,9 +39,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.liwo.habits.data.model.HabitLog
 import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyHabitItem
 import com.liwo.habits.ui.components.StatusSelector
@@ -58,6 +62,7 @@ fun CalendarScreen() {
     val visibleMonth by vm.visibleMonth.collectAsState()
     val selectedIso by vm.selectedDate.collectAsState()
     val dailyState by vm.dailyState.collectAsState()
+    val monthLogs by vm.monthLogs.collectAsState()
 
     val iso = remember { DateTimeFormatter.ISO_LOCAL_DATE }
     val selectedDate = remember(selectedIso) { LocalDate.parse(selectedIso, iso) }
@@ -143,6 +148,7 @@ fun CalendarScreen() {
                                 day = day,
                                 selected = day == selectedDate,
                                 inMonth = inMonth,
+                                logs = monthLogs[day.format(iso)] ?: emptyList(),
                                 onClick = {
                                     vm.setSelectedDate(day.format(iso))
                                     showSheet = true
@@ -248,6 +254,7 @@ private fun DayCell(
     day: LocalDate,
     selected: Boolean,
     inMonth: Boolean,
+    logs: List<HabitLog>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -266,6 +273,13 @@ private fun DayCell(
             else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
         }
 
+    val dotColor = when {
+        logs.isEmpty() -> null
+        logs.all { it.status == HabitStatus.DONE } -> MaterialTheme.colorScheme.primary
+        logs.all { it.status == HabitStatus.MISSED } -> MaterialTheme.colorScheme.error
+        else -> Color(0xFFFACC15)
+    }
+
     Box(
         modifier = modifier
             .aspectRatio(1f)
@@ -279,6 +293,14 @@ private fun DayCell(
             style = MaterialTheme.typography.titleSmall,
             color = textColor
         )
+        if (dotColor != null) {
+            Box(
+                Modifier
+                    .size(6.dp)
+                    .background(dotColor, CircleShape)
+                    .align(Alignment.BottomCenter)
+            )
+        }
     }
 }
 

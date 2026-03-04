@@ -10,18 +10,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyHabitItem
 import com.liwo.habits.ui.components.StatusSelector
+import com.liwo.habits.util.DateUtil
 import com.liwo.habits.vm.DashboardViewModel
 
 @Composable
@@ -30,12 +38,47 @@ fun DashboardScreen() {
     val vm: DashboardViewModel = viewModel()
     val state by vm.state.collectAsState()
 
+    val isToday = state.selectedDate == DateUtil.today()
+    val dateLabel = if (isToday) "Today" else DateUtil.pretty(state.selectedDate)
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(onClick = { vm.prevDay() }) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Previous day"
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(dateLabel, style = MaterialTheme.typography.titleMedium)
+                    if (!isToday) {
+                        Spacer(Modifier.padding(top = 4.dp))
+                        OutlinedButton(onClick = { vm.goToday() }) {
+                            Text("Today")
+                        }
+                    }
+                }
+
+                IconButton(onClick = { vm.nextDay() }) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Next day"
+                    )
+                }
+            }
+        }
 
         item {
             Row(
@@ -79,14 +122,10 @@ fun DashboardScreen() {
             }
         }
 
-        item {
-            Text("Today", style = MaterialTheme.typography.titleMedium)
-        }
-
         if (state.daily.habits.isEmpty()) {
             item {
                 Text(
-                    "No habits scheduled for today.",
+                    "No habits scheduled for this day.",
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -94,7 +133,7 @@ fun DashboardScreen() {
 
             itemsIndexed(
                 items = state.daily.habits,
-                key = { index, item -> "${item.id}-$index" } // unique key (prevents LazyColumn crashes)
+                key = { index, item -> "${item.id}-$index" }
             ) { _, item ->
                 HabitStatusCard(
                     item = item,
@@ -128,7 +167,6 @@ private fun HabitStatusCard(
 
             Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            // Shared selector (same one Calendar uses)
             StatusSelector(
                 status = item.status,
                 onChange = { newStatus -> onSetStatus(newStatus) }

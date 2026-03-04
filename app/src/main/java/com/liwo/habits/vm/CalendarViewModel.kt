@@ -8,10 +8,12 @@ import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
 import com.liwo.habits.util.AppLogger
+import com.liwo.habits.data.model.HabitLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -30,6 +32,16 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _selectedDate = MutableStateFlow(LocalDate.now().format(iso))
     val selectedDate: StateFlow<String> = _selectedDate
+
+    val monthLogs: StateFlow<Map<String, List<HabitLog>>> =
+        _visibleMonth
+            .flatMapLatest { month ->
+                val start = month.atDay(1).toString()
+                val end = month.atEndOfMonth().toString()
+                db.habitLogDao().observeLogsForDateRange(start, end)
+            }
+            .map { logs -> logs.groupBy { it.date } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
     // Habits/logs for the selected day
     val dailyState: StateFlow<DailyState> =

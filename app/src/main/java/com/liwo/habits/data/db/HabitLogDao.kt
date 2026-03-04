@@ -13,6 +13,9 @@ interface HabitLogDao {
     @Query("SELECT * FROM habit_logs WHERE date = :date")
     fun observeLogsForDate(date: String): Flow<List<HabitLog>>
 
+    @Query("SELECT * FROM habit_logs WHERE date >= :start AND date <= :end")
+    fun observeLogsForDateRange(start: String, end: String): Flow<List<HabitLog>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertLog(log: HabitLog)
 
