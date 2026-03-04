@@ -17,9 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.time.LocalDate
 
 sealed interface ExportState {
     data class Success(val message: String) : ExportState
@@ -72,7 +70,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun saveToDownloads(ctx: Context): String {
         val content = AppLogger.readAll()
-        val date = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val date = LocalDate.now().toString()
         val fileName = "habits_log_$date.txt"
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

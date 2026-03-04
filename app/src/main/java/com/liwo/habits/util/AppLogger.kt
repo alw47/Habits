@@ -3,9 +3,8 @@ package com.liwo.habits.util
 import android.content.Context
 import android.util.Log
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object AppLogger {
 
@@ -15,7 +14,7 @@ object AppLogger {
     private const val MAX_SIZE_BYTES = 512 * 1024L // 512 KB
 
     private val lock = Any()
-    private val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
 
     @Volatile
     private var logFile: File? = null
@@ -37,7 +36,7 @@ object AppLogger {
 
     private fun write(level: String, tag: String, msg: String, throwable: Throwable?) {
         val file = logFile ?: return
-        val timestamp = synchronized(formatter) { formatter.format(Date()) }
+        val timestamp = formatter.format(LocalDateTime.now())
         val line = buildString {
             append("$timestamp | $level | $tag | $msg")
             if (throwable != null) {

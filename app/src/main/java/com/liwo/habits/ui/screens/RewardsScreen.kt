@@ -19,9 +19,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.liwo.habits.data.model.Reward
 import com.liwo.habits.vm.RewardsViewModel
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun RewardsScreen() {
@@ -362,6 +362,6 @@ private fun RewardEditorDialog(
 }
 
 private fun formatDateTime(ms: Long): String {
-    val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-    return fmt.format(Date(ms))
+    val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    return Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault()).format(fmt)
 }
