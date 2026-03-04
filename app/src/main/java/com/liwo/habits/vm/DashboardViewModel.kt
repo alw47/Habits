@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.liwo.habits.data.db.AppDatabase
+import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
 import com.liwo.habits.util.AppLogger
@@ -45,9 +46,9 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
 
             val dayTotal = daily.habits.sumOf {
                 when (it.status) {
-                    1 -> it.pointsDone
-                    -1 -> it.pointsMissed
-                    else -> 0
+                    HabitStatus.DONE -> it.pointsDone
+                    HabitStatus.MISSED -> it.pointsMissed
+                    HabitStatus.NONE -> 0
                 }
             }
 
@@ -68,7 +69,7 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
             )
         )
 
-    fun setStatus(habitId: Long, status: Int) {
+    fun setStatus(habitId: Long, status: HabitStatus) {
         viewModelScope.launch {
             repo.setStatus(habitId = habitId, date = today, status = status)
             AppLogger.i("Dashboard", "Status set: habit=$habitId status=$status date=$today")

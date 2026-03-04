@@ -11,5 +11,5 @@ import androidx.room.Index
 data class HabitLog(
     val habitId: Long,
     val date: String, // "YYYY-MM-DD"
-    val status: Int   // 1 done, -1 missed, 0 none (0 means row removed)
+    val status: HabitStatus
 )

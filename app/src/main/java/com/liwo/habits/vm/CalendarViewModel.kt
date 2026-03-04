@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.liwo.habits.data.db.AppDatabase
+import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
 import com.liwo.habits.util.AppLogger
@@ -63,7 +64,7 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
         return "$monthName ${ym.year}"
     }
 
-    fun setHabitStatus(habitId: Long, status: Int) {
+    fun setHabitStatus(habitId: Long, status: HabitStatus) {
         val date = _selectedDate.value
         viewModelScope.launch {
             repo.setStatus(habitId = habitId, date = date, status = status)

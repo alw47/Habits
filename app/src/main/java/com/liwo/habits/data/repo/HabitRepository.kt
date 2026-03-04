@@ -3,6 +3,7 @@ package com.liwo.habits.data.repo
 import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.model.Habit
 import com.liwo.habits.data.model.HabitLog
+import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.util.WeekdayMask
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -28,7 +29,7 @@ class HabitRepository(private val db: AppDatabase) {
                         name = h.name,
                         pointsDone = h.pointsDone,
                         pointsMissed = h.pointsMissed,
-                        status = logMap[h.id]?.status ?: 0
+                        status = logMap[h.id]?.status ?: HabitStatus.NONE
                     )
                 }
 
@@ -71,8 +72,8 @@ class HabitRepository(private val db: AppDatabase) {
         db.habitDao().upsertHabit(b.copy(sortOrder = a.sortOrder))
     }
 
-    suspend fun setStatus(habitId: Long, date: String, status: Int) {
-        if (status == 0) {
+    suspend fun setStatus(habitId: Long, date: String, status: HabitStatus) {
+        if (status == HabitStatus.NONE) {
             db.habitLogDao().deleteLog(habitId, date)
         } else {
             db.habitLogDao().upsertLog(
@@ -124,5 +125,5 @@ data class DailyHabitItem(
     val name: String,
     val pointsDone: Int,
     val pointsMissed: Int,
-    val status: Int // 1 done, -1 missed, 0 none
+    val status: HabitStatus
 )

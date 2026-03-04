@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyHabitItem
 import com.liwo.habits.ui.components.StatusSelector
 import com.liwo.habits.vm.DashboardViewModel
@@ -107,7 +108,7 @@ fun DashboardScreen() {
 @Composable
 private fun HabitStatusCard(
     item: DailyHabitItem,
-    onSetStatus: (Int) -> Unit
+    onSetStatus: (HabitStatus) -> Unit
 ) {
     ElevatedCard {
         Column(
@@ -120,9 +121,9 @@ private fun HabitStatusCard(
 
             val subtitle =
                 when (item.status) {
-                    1 -> "Done (${fmtPoints(item.pointsDone)})"
-                    -1 -> "Missed (${fmtPoints(item.pointsMissed)})"
-                    else -> "None"
+                    HabitStatus.DONE -> "Done (${fmtPoints(item.pointsDone)})"
+                    HabitStatus.MISSED -> "Missed (${fmtPoints(item.pointsMissed)})"
+                    HabitStatus.NONE -> "None"
                 }
 
             Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)

@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyHabitItem
 import com.liwo.habits.ui.components.StatusSelector
 import com.liwo.habits.util.DateUtil
@@ -215,7 +216,7 @@ private fun SheetHeader(title: String, onClose: () -> Unit) {
 @Composable
 private fun HabitStatusCardInSheet(
     item: DailyHabitItem,
-    onSet: (Int) -> Unit
+    onSet: (HabitStatus) -> Unit
 ) {
     ElevatedCard {
         Column(

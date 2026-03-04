@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.liwo.habits.data.model.Habit
 import com.liwo.habits.data.model.HabitLog
 import com.liwo.habits.data.model.Redemption
 import com.liwo.habits.data.model.Reward
 
+@TypeConverters(Converters::class)
 @Database(
     entities = [
         Habit::class,
