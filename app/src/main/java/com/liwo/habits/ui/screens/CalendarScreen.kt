@@ -300,8 +300,10 @@ private fun buildMonthGrid(month: YearMonth): List<LocalDate> {
     }
 
     val gridStart = firstOfMonth.minusDays(offsetToMonday.toLong())
-    return List(42) { i -> gridStart.plusDays(i.toLong()) }
+    return List(CALENDAR_CELL_COUNT) { i -> gridStart.plusDays(i.toLong()) }
 }
+
+private const val CALENDAR_CELL_COUNT = 42 // 6 weeks × 7 days
 
 private fun fmtPoints(p: Int): String =
     if (p > 0) "+$p" else p.toString()
