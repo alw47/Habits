@@ -1,15 +1,64 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# === OS / Editor junk ===
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+Thumbs.db
+
+# === Android Studio / IntelliJ ===
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Keep code style configs if you use them (optional)
+# !.idea/codeStyles/
+# !.idea/codeStyleConfig.xml
+
+# === Gradle ===
+.gradle/
+build/
+**/build/
+
+# === Local config (NEVER commit) ===
 local.properties
+
+# === Android build artifacts ===
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+
+# === External native build ===
+.externalNativeBuild/
+.cxx/
+
+# === Kotlin / Java tooling ===
+kotlin-js-store/
+hs_err_pid*
+
+# === Logs ===
+*.log
+
+# === Keystores (NEVER commit) ===
+*.jks
+*.keystore
+*.pem
+*.p12
+
+# === Firebase / Google services (optional: uncomment if you want to keep it private) ===
+# google-services.json
+
+# === NDK / CMake ===
+obj/
+
+# === Fastlane (if you ever add it) ===
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/readme.md
+
+# === Compose / misc caches ===
+/.kotlin/
