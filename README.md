@@ -4,15 +4,14 @@
 
 Habit tracker and reward system built with **Android + Kotlin**.
 
-The app is designed to help create daily structure with simple habit completion tracking, streaks, and reward redemptions — without requiring accounts or cloud services.
+The app is designed to help create daily structure with simple habit completion tracking and reward redemptions — without requiring accounts or cloud services.
 
 ## Features
 
 - ✅ Create and track habits
 - 📅 Calendar-based day tracking
-- 🔥 Streak tracking
 - 🎁 Rewards + redemptions (spend points)
-- 📊 Basic stats (recent activity / totals)
+- 📊 Points balance (earned vs. spent)
 - 📴 Offline storage (Room database)
 
 ## Tech Stack
@@ -36,8 +35,10 @@ The app is designed to help create daily structure with simple habit completion 
 ## Project Structure (high level)
 
 - `app/` — Android app module
-- `data/` — database + repositories
-- `ui/` — screens and composables
+- `app/data/` — database, DAOs, and repositories
+- `app/ui/` — screens and composables
+- `app/vm/` — ViewModels
+- `app/util/` — utilities (date helpers, logger)
 
 ## License
 
