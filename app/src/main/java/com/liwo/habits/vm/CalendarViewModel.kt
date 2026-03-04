@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
+import com.liwo.habits.util.AppLogger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -66,6 +67,7 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
         val date = _selectedDate.value
         viewModelScope.launch {
             repo.setStatus(habitId = habitId, date = date, status = status)
+            AppLogger.i("Calendar", "Status set: habit=$habitId status=$status date=$date")
         }
     }
 }

@@ -12,6 +12,7 @@ import com.liwo.habits.ui.AppSettings
 import com.liwo.habits.ui.LocalAppSettings
 import com.liwo.habits.ui.theme.AppThemeMode
 import com.liwo.habits.ui.theme.HabitsTheme
+import com.liwo.habits.util.AppLogger
 
 private const val PREFS_FILE = "habits_prefs"
 private const val KEY_THEME_MODE = "theme_mode" // "DarkGreen" or "LightBlue"
@@ -19,6 +20,8 @@ private const val KEY_THEME_MODE = "theme_mode" // "DarkGreen" or "LightBlue"
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLogger.init(this)
+        AppLogger.i("App", "App started")
         enableEdgeToEdge()
 
         setContent {

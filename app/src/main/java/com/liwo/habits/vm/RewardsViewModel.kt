@@ -8,6 +8,7 @@ import com.liwo.habits.data.model.Redemption
 import com.liwo.habits.data.model.Reward
 import com.liwo.habits.data.repo.RewardsRepository
 import com.liwo.habits.data.repo.RewardsState
+import com.liwo.habits.util.AppLogger
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -48,9 +49,9 @@ class RewardsViewModel(app: Application) : AndroidViewModel(app) {
                     isActive = isActive,
                     isRecurring = isRecurring
                 )
+                AppLogger.i("Rewards", "Reward saved: $name")
             } catch (t: Throwable) {
-                // swallow to avoid app crash; UI should be stable even if DB errors
-                t.printStackTrace()
+                AppLogger.e("Rewards", "Failed to save reward: $name", t)
             }
         }
     }
@@ -59,8 +60,9 @@ class RewardsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 repo.deleteReward(reward)
+                AppLogger.i("Rewards", "Reward deleted: ${reward.name}")
             } catch (t: Throwable) {
-                t.printStackTrace()
+                AppLogger.e("Rewards", "Failed to delete reward: ${reward.name}", t)
                 onError(t.message ?: "Could not delete reward.")
             }
         }
@@ -70,8 +72,9 @@ class RewardsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 repo.setActive(id, active)
+                AppLogger.i("Rewards", "Reward $id active=$active")
             } catch (t: Throwable) {
-                t.printStackTrace()
+                AppLogger.e("Rewards", "Failed to set reward $id active=$active", t)
                 onError(t.message ?: "Could not update reward.")
             }
         }
@@ -84,10 +87,11 @@ class RewardsViewModel(app: Application) : AndroidViewModel(app) {
                 if (res.isFailure) {
                     onError(res.exceptionOrNull()?.message ?: "Could not redeem.")
                 } else {
+                    AppLogger.i("Rewards", "Redeemed: ${reward.name} (${reward.cost} pts)")
                     onSuccess()
                 }
             } catch (t: Throwable) {
-                t.printStackTrace()
+                AppLogger.e("Rewards", "Redeem failed for: ${reward.name}", t)
                 onError(t.message ?: "Redeem failed.")
             }
         }
@@ -97,8 +101,9 @@ class RewardsViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 repo.undoRedemption(redemptionId)
+                AppLogger.i("Rewards", "Undo redemption: $redemptionId")
             } catch (t: Throwable) {
-                t.printStackTrace()
+                AppLogger.e("Rewards", "Failed to undo redemption: $redemptionId", t)
                 onError(t.message ?: "Could not undo redemption.")
             }
         }

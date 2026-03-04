@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.model.Habit
 import com.liwo.habits.data.repo.HabitRepository
+import com.liwo.habits.util.AppLogger
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -36,15 +37,22 @@ class HabitsViewModel(app: Application) : AndroidViewModel(app) {
                 isActive = isActive,
                 daysMask = daysMask
             )
+            AppLogger.i("Habits", "Habit saved: $name")
         }
     }
 
     fun deleteHabit(habit: Habit) {
-        viewModelScope.launch { repo.deleteHabit(habit) }
+        viewModelScope.launch {
+            repo.deleteHabit(habit)
+            AppLogger.i("Habits", "Habit deleted: ${habit.name}")
+        }
     }
 
     fun setActive(habitId: Long, active: Boolean) {
-        viewModelScope.launch { repo.setActive(habitId, active) }
+        viewModelScope.launch {
+            repo.setActive(habitId, active)
+            AppLogger.i("Habits", "Habit $habitId active=$active")
+        }
     }
 
     fun moveUp(habits: List<Habit>, index: Int) {

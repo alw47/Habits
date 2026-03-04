@@ -1,5 +1,7 @@
 # Habits
 
+> **Disclaimer:** This app is vibe coded with [Claude](https://claude.ai) and [ChatGPT](https://chatgpt.com).
+
 Habit tracker and reward system built with **Android + Kotlin**.
 
 The app is designed to help create daily structure with simple habit completion tracking, streaks, and reward redemptions — without requiring accounts or cloud services.

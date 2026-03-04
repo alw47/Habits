@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.model.Redemption
 import com.liwo.habits.data.model.Reward
+import com.liwo.habits.util.AppLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -127,7 +128,7 @@ class RewardsRepository(private val db: AppDatabase) {
                 Result.success(Unit)
             }
         } catch (t: Throwable) {
-            t.printStackTrace()
+            AppLogger.e("RewardsRepo", "redeem() failed for reward ${reward.id}", t)
             Result.failure(t)
         }
     }

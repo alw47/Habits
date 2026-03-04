@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
+import com.liwo.habits.util.AppLogger
 import com.liwo.habits.util.DateUtil
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,6 +71,7 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
     fun setStatus(habitId: Long, status: Int) {
         viewModelScope.launch {
             repo.setStatus(habitId = habitId, date = today, status = status)
+            AppLogger.i("Dashboard", "Status set: habit=$habitId status=$status date=$today")
         }
     }
 }
