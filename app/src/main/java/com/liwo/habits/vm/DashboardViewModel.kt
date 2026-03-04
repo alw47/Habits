@@ -27,8 +27,10 @@ data class DashboardState(
 
 class DashboardViewModel(
     app: Application,
-    private val db: AppDatabase = AppDatabase.get(app)
+    private val db: AppDatabase
 ) : AndroidViewModel(app) {
+
+    constructor(app: Application) : this(app, AppDatabase.get(app))
 
     private val repo = HabitRepository(db)
 

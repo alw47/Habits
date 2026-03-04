@@ -22,8 +22,10 @@ import java.time.format.DateTimeFormatter
 
 class CalendarViewModel(
     app: Application,
-    private val db: AppDatabase = AppDatabase.get(app)
+    private val db: AppDatabase
 ) : AndroidViewModel(app) {
+
+    constructor(app: Application) : this(app, AppDatabase.get(app))
 
     private val repo = HabitRepository(db)
 
