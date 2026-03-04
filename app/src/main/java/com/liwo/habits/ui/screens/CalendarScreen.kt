@@ -40,6 +40,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -53,6 +55,7 @@ import com.liwo.habits.vm.CalendarViewModel
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -280,10 +283,13 @@ private fun DayCell(
         else -> Color(0xFFFACC15)
     }
 
+    val dateLabel = day.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.getDefault()))
+
     Box(
         modifier = modifier
             .aspectRatio(1f)
             .background(bgColor, shape)
+            .semantics { contentDescription = dateLabel }
             .clickable { onClick() }
             .padding(8.dp),
         contentAlignment = Alignment.TopEnd

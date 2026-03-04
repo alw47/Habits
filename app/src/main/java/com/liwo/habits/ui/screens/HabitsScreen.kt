@@ -15,6 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.liwo.habits.data.model.Habit
@@ -70,7 +72,10 @@ fun HabitsScreen() {
                                     }
                                     Switch(
                                         checked = h.isActive,
-                                        onCheckedChange = { vm.setActive(h.id, it) }
+                                        onCheckedChange = { vm.setActive(h.id, it) },
+                                        modifier = Modifier.semantics {
+                                            contentDescription = if (h.isActive) "${h.name}: active" else "${h.name}: inactive"
+                                        }
                                     )
                                 }
 
@@ -251,11 +256,11 @@ private fun WeekdaySelector(mask: Int, onMaskChange: (Int) -> Unit) {
         verticalSpacing = 8.dp
     ) {
         days.forEach { (label, bit) ->
-            val selected = (mask and bit) != 0
+            val selected = WeekdayMask.contains(mask, bit)
             FilterChip(
                 selected = selected,
                 onClick = {
-                    val next = if (selected) (mask and bit.inv()) else (mask or bit)
+                    val next = WeekdayMask.toggle(mask, bit)
                     onMaskChange(if (next == 0) mask else next) // prevent 0 days
                 },
                 label = { Text(label) }
@@ -312,11 +317,6 @@ private fun WrapRow(
     }
 }
 
-private fun maskLabel(mask: Int): String = when (mask) {
-    WeekdayMask.EVERYDAY -> "Every day"
-    WeekdayMask.WEEKDAYS -> "Weekdays"
-    WeekdayMask.WEEKENDS -> "Weekends"
-    else -> "Custom"
-}
+private fun maskLabel(mask: Int): String = WeekdayMask.label(mask)
 
 private fun fmtPoints(p: Int): String = if (p > 0) "+$p" else p.toString()

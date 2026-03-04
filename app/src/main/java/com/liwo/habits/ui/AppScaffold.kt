@@ -36,35 +36,35 @@ fun AppScaffold() {
                 NavigationBarItem(
                     selected = tab == BottomTab.Dashboard,
                     onClick = { tab = BottomTab.Dashboard },
-                    icon = { Icon(Icons.Filled.Home, null) },
+                    icon = { Icon(Icons.Filled.Home, contentDescription = "Dashboard") },
                     label = tabLabel("Dashboard"),
                     alwaysShowLabel = false
                 )
                 NavigationBarItem(
                     selected = tab == BottomTab.Habits,
                     onClick = { tab = BottomTab.Habits },
-                    icon = { Icon(Icons.Filled.TaskAlt, null) },
+                    icon = { Icon(Icons.Filled.TaskAlt, contentDescription = "Habits") },
                     label = tabLabel("Habits"),
                     alwaysShowLabel = false
                 )
                 NavigationBarItem(
                     selected = tab == BottomTab.Rewards,
                     onClick = { tab = BottomTab.Rewards },
-                    icon = { Icon(Icons.Filled.Star, null) },
+                    icon = { Icon(Icons.Filled.Star, contentDescription = "Rewards") },
                     label = tabLabel("Rewards"),
                     alwaysShowLabel = false
                 )
                 NavigationBarItem(
                     selected = tab == BottomTab.Calendar,
                     onClick = { tab = BottomTab.Calendar },
-                    icon = { Icon(Icons.Filled.CalendarMonth, null) },
+                    icon = { Icon(Icons.Filled.CalendarMonth, contentDescription = "Calendar") },
                     label = tabLabel("Calendar"),
                     alwaysShowLabel = false
                 )
                 NavigationBarItem(
                     selected = tab == BottomTab.Settings,
                     onClick = { tab = BottomTab.Settings },
-                    icon = { Icon(Icons.Filled.Settings, null) },
+                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
                     label = tabLabel("Settings"),
                     alwaysShowLabel = false
                 )

@@ -32,6 +32,9 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
 
+        // The singleton is intentionally never closed. Room is designed to live for the
+        // full application lifetime; the OS reclaims all SQLite resources when the process
+        // exits. Calling close() mid-session would invalidate all active DAOs and flows.
         fun get(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(

@@ -31,6 +31,18 @@ object WeekdayMask {
             7 -> SUN
             else -> MON
         }
-        return (mask and bit) != 0
+        return contains(mask, bit)
+    }
+
+    fun contains(mask: Int, bit: Int): Boolean = (mask and bit) != 0
+
+    /** Toggle a single day bit on or off. */
+    fun toggle(mask: Int, bit: Int): Int = mask xor bit
+
+    fun label(mask: Int): String = when (mask) {
+        EVERYDAY -> "Every day"
+        WEEKDAYS -> "Weekdays"
+        WEEKENDS -> "Weekends"
+        else -> "Custom"
     }
 }

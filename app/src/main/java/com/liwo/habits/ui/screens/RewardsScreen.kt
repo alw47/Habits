@@ -14,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.liwo.habits.data.model.Reward
@@ -133,6 +135,9 @@ fun RewardsScreen() {
                                 checked = r.isActive,
                                 onCheckedChange = { active ->
                                     vm.setActive(r.id, active) { msg -> showMsg(msg) }
+                                },
+                                modifier = Modifier.semantics {
+                                    contentDescription = if (r.isActive) "${r.name}: active" else "${r.name}: inactive"
                                 }
                             )
                         }
@@ -345,13 +350,21 @@ private fun RewardEditorDialog(
                     Text("Redeem type", color = MaterialTheme.colorScheme.onSurfaceVariant)
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(selected = recurring, onClick = { recurring = true })
+                        RadioButton(
+                            selected = recurring,
+                            onClick = { recurring = true },
+                            modifier = Modifier.semantics { contentDescription = "Recurring" }
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text("Recurring")
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(selected = !recurring, onClick = { recurring = false })
+                        RadioButton(
+                            selected = !recurring,
+                            onClick = { recurring = false },
+                            modifier = Modifier.semantics { contentDescription = "Single redeem" }
+                        )
                         Spacer(Modifier.width(8.dp))
                         Text("Single redeem")
                     }
