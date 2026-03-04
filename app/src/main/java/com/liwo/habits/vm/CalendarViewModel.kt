@@ -20,9 +20,11 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 
-class CalendarViewModel(app: Application) : AndroidViewModel(app) {
+class CalendarViewModel(
+    app: Application,
+    private val db: AppDatabase = AppDatabase.get(app)
+) : AndroidViewModel(app) {
 
-    private val db = AppDatabase.get(app)
     private val repo = HabitRepository(db)
 
     private val iso = DateTimeFormatter.ISO_LOCAL_DATE

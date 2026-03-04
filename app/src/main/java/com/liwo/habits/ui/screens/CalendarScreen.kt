@@ -48,8 +48,8 @@ import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyHabitItem
 import com.liwo.habits.ui.components.StatusSelector
 import com.liwo.habits.util.DateUtil
+import com.liwo.habits.util.buildMonthGrid
 import com.liwo.habits.vm.CalendarViewModel
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
@@ -303,29 +303,6 @@ private fun DayCell(
         }
     }
 }
-
-/**
- * Returns a list of exactly 42 dates (6 weeks x 7 days),
- * starting on Monday, filling with previous/next month days.
- */
-private fun buildMonthGrid(month: YearMonth): List<LocalDate> {
-    val firstOfMonth = month.atDay(1)
-
-    val offsetToMonday = when (firstOfMonth.dayOfWeek) {
-        DayOfWeek.MONDAY -> 0
-        DayOfWeek.TUESDAY -> 1
-        DayOfWeek.WEDNESDAY -> 2
-        DayOfWeek.THURSDAY -> 3
-        DayOfWeek.FRIDAY -> 4
-        DayOfWeek.SATURDAY -> 5
-        DayOfWeek.SUNDAY -> 6
-    }
-
-    val gridStart = firstOfMonth.minusDays(offsetToMonday.toLong())
-    return List(CALENDAR_CELL_COUNT) { i -> gridStart.plusDays(i.toLong()) }
-}
-
-private const val CALENDAR_CELL_COUNT = 42 // 6 weeks × 7 days
 
 private fun fmtPoints(p: Int): String =
     if (p > 0) "+$p" else p.toString()

@@ -25,9 +25,11 @@ data class DashboardState(
     val daily: DailyState
 )
 
-class DashboardViewModel(app: Application) : AndroidViewModel(app) {
+class DashboardViewModel(
+    app: Application,
+    private val db: AppDatabase = AppDatabase.get(app)
+) : AndroidViewModel(app) {
 
-    private val db = AppDatabase.get(app)
     private val repo = HabitRepository(db)
 
     private val today = DateUtil.today()
