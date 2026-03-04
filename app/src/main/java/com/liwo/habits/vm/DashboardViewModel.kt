@@ -34,8 +34,8 @@ class DashboardViewModel(app: Application) : AndroidViewModel(app) {
             db.habitLogDao().observeTotalPointsEarned(),
             db.redemptionDao().observeTotalSpent()
         ) { earned, spent ->
-            val e = (earned ?: 0L).toInt()
-            val s = (spent ?: 0L).toInt()
+            val e = earned.toInt()
+            val s = spent.toInt()
             e - s
         }
 

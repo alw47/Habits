@@ -12,11 +12,11 @@ interface RedemptionDao {
     @Query("SELECT * FROM redemptions ORDER BY createdAtMillis DESC LIMIT :limit")
     fun observeRecent(limit: Int): Flow<List<Redemption>>
 
-    @Query("SELECT SUM(cost) FROM redemptions")
-    fun observeTotalSpent(): Flow<Long?>
+    @Query("SELECT COALESCE(SUM(cost), 0) FROM redemptions")
+    fun observeTotalSpent(): Flow<Long>
 
-    @Query("SELECT SUM(cost) FROM redemptions")
-    suspend fun getTotalSpent(): Long?
+    @Query("SELECT COALESCE(SUM(cost), 0) FROM redemptions")
+    suspend fun getTotalSpent(): Long
 
     @Query("SELECT COUNT(*) FROM redemptions WHERE rewardId = :rewardId")
     suspend fun countForReward(rewardId: Long): Int

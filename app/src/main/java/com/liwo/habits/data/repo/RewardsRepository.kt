@@ -12,15 +12,15 @@ class RewardsRepository(private val db: AppDatabase) {
 
     // Points = earned (from habits) - spent (from redemptions)
     fun observeRewardsState(): Flow<RewardsState> {
-        val pointsEarnedFlow = db.habitLogDao().observeTotalPointsEarned() // Flow<Long?>
-        val pointsSpentFlow = db.redemptionDao().observeTotalSpent()       // Flow<Long?>
+        val pointsEarnedFlow = db.habitLogDao().observeTotalPointsEarned()
+        val pointsSpentFlow = db.redemptionDao().observeTotalSpent()
 
         val rewardsFlow = db.rewardDao().observeAll()
         val historyFlow = db.redemptionDao().observeRecent(limit = 500)
 
         return combine(pointsEarnedFlow, pointsSpentFlow, rewardsFlow, historyFlow) { earned, spent, rewards, history ->
             val earnedLong = earned
-            val spentLong = spent ?: 0L
+            val spentLong = spent
             val availableLong = earnedLong - spentLong
 
             // Clamp to Int range to avoid overflow crashes
@@ -95,9 +95,8 @@ class RewardsRepository(private val db: AppDatabase) {
                     return@withTransaction Result.failure(IllegalStateException("Reward is inactive."))
                 }
 
-                // These are Long? in your DAO, so null-safe is correct.
                 val earned = db.habitLogDao().getTotalPointsEarned()
-                val spent = db.redemptionDao().getTotalSpent() ?: 0L
+                val spent = db.redemptionDao().getTotalSpent()
                 val available = earned - spent
 
                 if (available < latest.cost.toLong()) {
