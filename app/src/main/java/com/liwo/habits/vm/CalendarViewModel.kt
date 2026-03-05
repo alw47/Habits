@@ -1,14 +1,13 @@
 package com.liwo.habits.vm
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.liwo.habits.data.db.AppDatabase
+import com.liwo.habits.data.model.HabitLog
 import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
 import com.liwo.habits.util.AppLogger
-import com.liwo.habits.data.model.HabitLog
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,15 +18,14 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
+import javax.inject.Inject
 
-class CalendarViewModel(
-    app: Application,
-    private val db: AppDatabase
-) : AndroidViewModel(app) {
-
-    constructor(app: Application) : this(app, AppDatabase.get(app))
-
-    private val repo = HabitRepository(db)
+@HiltViewModel
+class CalendarViewModel @Inject constructor(
+    private val repo: HabitRepository
+) : ViewModel() {
 
     private val iso = DateTimeFormatter.ISO_LOCAL_DATE
 
@@ -42,7 +40,7 @@ class CalendarViewModel(
             .flatMapLatest { month ->
                 val start = month.atDay(1).toString()
                 val end = month.atEndOfMonth().toString()
-                db.habitLogDao().observeLogsForDateRange(start, end)
+                repo.observeLogsForDateRange(start, end)
             }
             .map { logs -> logs.groupBy { it.date } }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
@@ -75,16 +73,20 @@ class CalendarViewModel(
 
     fun monthLabel(): String {
         val ym = _visibleMonth.value
-        // "March 2026"
-        val monthName = ym.month.name.lowercase().replaceFirstChar { it.uppercase() }
+        val monthName = ym.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
+            .replaceFirstChar { it.uppercaseChar() }
         return "$monthName ${ym.year}"
     }
 
     fun setHabitStatus(habitId: Long, status: HabitStatus) {
         val date = _selectedDate.value
         viewModelScope.launch {
-            repo.setStatus(habitId = habitId, date = date, status = status)
-            AppLogger.i("Calendar", "Status set: habit=$habitId status=$status date=$date")
+            try {
+                repo.setStatus(habitId = habitId, date = date, status = status)
+                AppLogger.i("Calendar", "Status set: habit=$habitId status=$status date=$date")
+            } catch (t: Throwable) {
+                AppLogger.e("Calendar", "Failed to set status: habit=$habitId", t)
+            }
         }
     }
 }

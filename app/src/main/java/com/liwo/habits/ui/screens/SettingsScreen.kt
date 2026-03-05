@@ -13,15 +13,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.liwo.habits.R
 import com.liwo.habits.ui.LocalAppSettings
 import com.liwo.habits.ui.theme.AppThemeMode
 import com.liwo.habits.vm.ExportState
 import com.liwo.habits.vm.SettingsViewModel
 
 @Composable
-fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
+fun SettingsScreen(vm: SettingsViewModel = hiltViewModel()) {
     val settings = LocalAppSettings.current
     val context = LocalContext.current
     val exportState by vm.exportState.collectAsState()
@@ -46,14 +48,14 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
         ) {
 
             Text(
-                text = "Appearance",
+                text = stringResource(R.string.section_appearance),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
             ThemeRow(
-                title = "Dark (Green)",
+                title = stringResource(R.string.theme_dark_green),
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.DarkMode,
@@ -71,7 +73,7 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
             HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 
             ThemeRow(
-                title = "Light (Blue)",
+                title = stringResource(R.string.theme_light_blue),
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.LightMode,
@@ -91,18 +93,18 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Diagnostics",
+                text = stringResource(R.string.section_diagnostics),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
             ActionRow(
-                title = "Save log to Downloads",
+                title = stringResource(R.string.action_save_log),
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.Download,
-                        contentDescription = "Save log to Downloads",
+                        contentDescription = stringResource(R.string.action_save_log),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
@@ -112,11 +114,11 @@ fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
             HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
 
             ActionRow(
-                title = "Send log by email",
+                title = stringResource(R.string.action_send_log),
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.Share,
-                        contentDescription = "Send log by email",
+                        contentDescription = stringResource(R.string.action_send_log),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },

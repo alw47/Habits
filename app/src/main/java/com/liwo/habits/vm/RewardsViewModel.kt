@@ -1,34 +1,36 @@
 package com.liwo.habits.vm
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.model.Redemption
 import com.liwo.habits.data.model.Reward
 import com.liwo.habits.data.repo.RewardsRepository
 import com.liwo.habits.data.repo.RewardsState
 import com.liwo.habits.util.AppLogger
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RewardsViewModel(app: Application) : AndroidViewModel(app) {
+private const val HISTORY_LIMIT = 50
 
-    private val db = AppDatabase.get(app)
-    private val repo = RewardsRepository(db)
+@HiltViewModel
+class RewardsViewModel @Inject constructor(
+    private val repo: RewardsRepository
+) : ViewModel() {
 
     val state: StateFlow<RewardsState> =
         repo.observeRewardsState()
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5_000),
-                RewardsState(pointsAvailable = 0, rewards = emptyList())
+                RewardsState(pointsAvailable = 0, pointsEarned = 0, rewards = emptyList())
             )
 
     val history: StateFlow<List<Redemption>> =
-        repo.observeHistory(50)
+        repo.observeHistory(HISTORY_LIMIT)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun saveReward(

@@ -1,6 +1,5 @@
 package com.liwo.habits
 
-import android.app.Application
 import app.cash.turbine.test
 import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.db.HabitDao
@@ -8,6 +7,7 @@ import com.liwo.habits.data.db.HabitLogDao
 import com.liwo.habits.data.db.RedemptionDao
 import com.liwo.habits.data.model.HabitLog
 import com.liwo.habits.data.model.HabitStatus
+import com.liwo.habits.data.repo.HabitRepository
 import com.liwo.habits.util.DateUtil
 import com.liwo.habits.vm.DashboardViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,6 @@ class DashboardViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
-    private lateinit var app: Application
     private lateinit var db: AppDatabase
     private lateinit var logDao: HabitLogDao
     private lateinit var habitDao: HabitDao
@@ -38,7 +37,6 @@ class DashboardViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        app = mock()
         db = mock()
         logDao = mock()
         habitDao = mock()
@@ -57,7 +55,7 @@ class DashboardViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun buildVm() = DashboardViewModel(app, db)
+    private fun buildVm() = DashboardViewModel(HabitRepository(db))
 
     @Test
     fun `initial selectedDate is today`() = runTest {

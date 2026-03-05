@@ -1,14 +1,13 @@
 package com.liwo.habits.vm
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyState
 import com.liwo.habits.data.repo.HabitRepository
 import com.liwo.habits.util.AppLogger
 import com.liwo.habits.util.DateUtil
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,23 +15,19 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class DashboardState(
-    val date: String,
     val selectedDate: String,
     val pointsAvailable: Int,
     val dayTotal: Int,
     val daily: DailyState
 )
 
-class DashboardViewModel(
-    app: Application,
-    private val db: AppDatabase
-) : AndroidViewModel(app) {
-
-    constructor(app: Application) : this(app, AppDatabase.get(app))
-
-    private val repo = HabitRepository(db)
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
+    private val repo: HabitRepository
+) : ViewModel() {
 
     private val today = DateUtil.today()
 
@@ -43,16 +38,7 @@ class DashboardViewModel(
     fun nextDay() { _selectedDate.value = DateUtil.addDays(_selectedDate.value, 1) }
     fun goToday() { _selectedDate.value = today }
 
-    private val pointsAvailableFlow =
-        combine(
-            db.habitLogDao().observeTotalPointsEarned(),
-            db.redemptionDao().observeTotalSpent()
-        ) { earned, spent ->
-            val e = earned.toInt()
-            val s = spent.toInt()
-            e - s
-        }
-
+    private val pointsAvailableFlow = repo.observePointsAvailable()
     private val dailyFlow = _selectedDate.flatMapLatest { repo.observeDailyState(it) }
 
     val state: StateFlow<DashboardState> =
@@ -67,7 +53,6 @@ class DashboardViewModel(
             }
 
             DashboardState(
-                date = date,
                 selectedDate = date,
                 pointsAvailable = available,
                 dayTotal = dayTotal,
@@ -77,7 +62,6 @@ class DashboardViewModel(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
             DashboardState(
-                date = today,
                 selectedDate = today,
                 pointsAvailable = 0,
                 dayTotal = 0,
@@ -88,8 +72,12 @@ class DashboardViewModel(
     fun setStatus(habitId: Long, status: HabitStatus) {
         val date = _selectedDate.value
         viewModelScope.launch {
-            repo.setStatus(habitId = habitId, date = date, status = status)
-            AppLogger.i("Dashboard", "Status set: habit=$habitId status=$status date=$date")
+            try {
+                repo.setStatus(habitId = habitId, date = date, status = status)
+                AppLogger.i("Dashboard", "Status set: habit=$habitId status=$status date=$date")
+            } catch (t: Throwable) {
+                AppLogger.e("Dashboard", "Failed to set status: habit=$habitId", t)
+            }
         }
     }
 }

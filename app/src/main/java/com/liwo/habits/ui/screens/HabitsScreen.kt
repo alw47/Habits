@@ -15,11 +15,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.liwo.habits.R
 import com.liwo.habits.data.model.Habit
+import com.liwo.habits.util.DateUtil
 import com.liwo.habits.util.WeekdayMask
 import com.liwo.habits.vm.HabitsViewModel
 import kotlin.math.max
@@ -28,16 +31,16 @@ import androidx.compose.ui.unit.Dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitsScreen() {
-    val vm: HabitsViewModel = viewModel()
+    val vm: HabitsViewModel = hiltViewModel()
     val habits by vm.habits.collectAsState()
-
-    var editing by remember { mutableStateOf<Habit?>(null) }
-    var showAdd by remember { mutableStateOf(false) }
+    val showAdd by vm.showAddDialog.collectAsState()
+    val editing by vm.editingHabit.collectAsState()
+    var confirmDelete by remember { mutableStateOf<Habit?>(null) }
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAdd = true }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add habit")
+            FloatingActionButton(onClick = { vm.openAdd() }) {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_add_habit))
             }
         }
     ) { padding ->
@@ -49,7 +52,7 @@ fun HabitsScreen() {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (habits.isEmpty()) {
-                Text("No habits yet. Tap + to create one.")
+                Text(stringResource(R.string.label_no_habits_empty))
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     itemsIndexed(habits, key = { _, h -> h.id }) { idx, h ->
@@ -65,7 +68,7 @@ fun HabitsScreen() {
                                     Column(Modifier.weight(1f)) {
                                         Text(h.name, style = MaterialTheme.typography.titleMedium)
                                         Text(
-                                            "${fmtPoints(h.pointsDone)} / ${fmtPoints(h.pointsMissed)} pts • ${maskLabel(h.daysMask)}",
+                                            "${DateUtil.fmtPoints(h.pointsDone)} / ${DateUtil.fmtPoints(h.pointsMissed)} pts • ${maskLabel(h.daysMask)}",
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -86,21 +89,21 @@ fun HabitsScreen() {
                                     OutlinedButton(
                                         onClick = { vm.moveUp(habits, idx) },
                                         enabled = idx > 0
-                                    ) { Icon(Icons.Filled.ArrowUpward, contentDescription = "Up") }
+                                    ) { Icon(Icons.Filled.ArrowUpward, contentDescription = stringResource(R.string.cd_move_up)) }
 
                                     OutlinedButton(
                                         onClick = { vm.moveDown(habits, idx) },
                                         enabled = idx < habits.lastIndex
-                                    ) { Icon(Icons.Filled.ArrowDownward, contentDescription = "Down") }
+                                    ) { Icon(Icons.Filled.ArrowDownward, contentDescription = stringResource(R.string.cd_move_down)) }
 
                                     Spacer(Modifier.weight(1f))
 
-                                    IconButton(onClick = { editing = h }) {
-                                        Icon(Icons.Filled.Edit, contentDescription = "Edit")
+                                    IconButton(onClick = { vm.openEdit(h) }) {
+                                        Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.cd_edit))
                                     }
 
-                                    IconButton(onClick = { vm.deleteHabit(h) }) {
-                                        Icon(Icons.Filled.Delete, contentDescription = "Delete")
+                                    IconButton(onClick = { confirmDelete = h }) {
+                                        Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.cd_delete))
                                     }
                                 }
                             }
@@ -113,9 +116,9 @@ fun HabitsScreen() {
 
     if (showAdd) {
         HabitEditorDialog(
-            title = "Add habit",
+            title = stringResource(R.string.dialog_add_habit),
             initial = null,
-            onDismiss = { showAdd = false },
+            onDismiss = { vm.dismissAdd() },
             onSave = { name, pointsDone, pointsMissed, active, mask ->
                 vm.saveHabit(
                     name = name,
@@ -124,16 +127,15 @@ fun HabitsScreen() {
                     isActive = active,
                     daysMask = mask
                 )
-                showAdd = false
             }
         )
     }
 
     if (editing != null) {
         HabitEditorDialog(
-            title = "Edit habit",
+            title = stringResource(R.string.dialog_edit_habit),
             initial = editing,
-            onDismiss = { editing = null },
+            onDismiss = { vm.dismissEdit() },
             onSave = { name, pointsDone, pointsMissed, active, mask ->
                 val h = editing!!
                 vm.saveHabit(
@@ -144,7 +146,24 @@ fun HabitsScreen() {
                     isActive = active,
                     daysMask = mask
                 )
-                editing = null
+            }
+        )
+    }
+
+    if (confirmDelete != null) {
+        val h = confirmDelete!!
+        AlertDialog(
+            onDismissRequest = { confirmDelete = null },
+            title = { Text(stringResource(R.string.dialog_delete_habit_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_habit_text, h.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.deleteHabit(h)
+                    confirmDelete = null
+                }) { Text(stringResource(R.string.btn_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmDelete = null }) { Text(stringResource(R.string.btn_cancel)) }
             }
         )
     }
@@ -174,9 +193,9 @@ private fun HabitEditorDialog(
             TextButton(
                 onClick = { onSave(name.trim(), done, missed, active, mask) },
                 enabled = name.trim().isNotEmpty()
-            ) { Text("Save") }
+            ) { Text(stringResource(R.string.btn_save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.btn_cancel)) } },
         text = {
             Column(
                 modifier = Modifier
@@ -187,7 +206,7 @@ private fun HabitEditorDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Habit name") },
+                    label = { Text(stringResource(R.string.field_habit_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -195,7 +214,7 @@ private fun HabitEditorDialog(
                 OutlinedTextField(
                     value = pointsDoneText,
                     onValueChange = { pointsDoneText = it.filter { c -> c.isDigit() || c == '-' } },
-                    label = { Text("Points when done") },
+                    label = { Text(stringResource(R.string.field_points_done)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -203,7 +222,7 @@ private fun HabitEditorDialog(
                 OutlinedTextField(
                     value = pointsMissedText,
                     onValueChange = { pointsMissedText = it.filter { c -> c.isDigit() || c == '-' } },
-                    label = { Text("Points when missed") },
+                    label = { Text(stringResource(R.string.field_points_missed)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -212,11 +231,11 @@ private fun HabitEditorDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Active")
+                    Text(stringResource(R.string.label_active))
                     Switch(checked = active, onCheckedChange = { active = it })
                 }
 
-                Text("Available days")
+                Text(stringResource(R.string.label_available_days))
 
                 // Presets (wrap)
                 WrapRow(
@@ -224,9 +243,9 @@ private fun HabitEditorDialog(
                     horizontalSpacing = 8.dp,
                     verticalSpacing = 8.dp
                 ) {
-                    AssistChip(onClick = { mask = WeekdayMask.EVERYDAY }, label = { Text("Every day") })
-                    AssistChip(onClick = { mask = WeekdayMask.WEEKDAYS }, label = { Text("Weekdays") })
-                    AssistChip(onClick = { mask = WeekdayMask.WEEKENDS }, label = { Text("Weekends") })
+                    AssistChip(onClick = { mask = WeekdayMask.EVERYDAY }, label = { Text(stringResource(R.string.preset_every_day)) })
+                    AssistChip(onClick = { mask = WeekdayMask.WEEKDAYS }, label = { Text(stringResource(R.string.preset_weekdays)) })
+                    AssistChip(onClick = { mask = WeekdayMask.WEEKENDS }, label = { Text(stringResource(R.string.preset_weekends)) })
                 }
 
                 // Weekday chips (wrap below)
@@ -241,13 +260,13 @@ private fun HabitEditorDialog(
 @Composable
 private fun WeekdaySelector(mask: Int, onMaskChange: (Int) -> Unit) {
     val days = listOf(
-        "Mon" to WeekdayMask.MON,
-        "Tue" to WeekdayMask.TUE,
-        "Wed" to WeekdayMask.WED,
-        "Thu" to WeekdayMask.THU,
-        "Fri" to WeekdayMask.FRI,
-        "Sat" to WeekdayMask.SAT,
-        "Sun" to WeekdayMask.SUN
+        stringResource(R.string.day_mon) to WeekdayMask.MON,
+        stringResource(R.string.day_tue) to WeekdayMask.TUE,
+        stringResource(R.string.day_wed) to WeekdayMask.WED,
+        stringResource(R.string.day_thu) to WeekdayMask.THU,
+        stringResource(R.string.day_fri) to WeekdayMask.FRI,
+        stringResource(R.string.day_sat) to WeekdayMask.SAT,
+        stringResource(R.string.day_sun) to WeekdayMask.SUN
     )
 
     WrapRow(
@@ -318,5 +337,3 @@ private fun WrapRow(
 }
 
 private fun maskLabel(mask: Int): String = WeekdayMask.label(mask)
-
-private fun fmtPoints(p: Int): String = if (p > 0) "+$p" else p.toString()

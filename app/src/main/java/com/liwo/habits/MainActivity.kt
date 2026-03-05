@@ -13,10 +13,12 @@ import com.liwo.habits.ui.LocalAppSettings
 import com.liwo.habits.ui.theme.AppThemeMode
 import com.liwo.habits.ui.theme.HabitsTheme
 import com.liwo.habits.util.AppLogger
+import dagger.hilt.android.AndroidEntryPoint
 
 private const val PREFS_FILE = "habits_prefs"
 private const val KEY_THEME_MODE = "theme_mode" // "DarkGreen" or "LightBlue"
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

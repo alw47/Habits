@@ -2,6 +2,10 @@ package com.liwo.habits.util
 
 import android.content.Context
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -15,6 +19,7 @@ object AppLogger {
 
     private val lock = Any()
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     @Volatile
     private var logFile: File? = null
@@ -36,6 +41,8 @@ object AppLogger {
 
     private fun write(level: String, tag: String, msg: String, throwable: Throwable?) {
         val file = logFile ?: return
+        // Capture timestamp and format the line on the calling thread for accuracy,
+        // then dispatch the actual disk write to the IO dispatcher.
         val timestamp = formatter.format(LocalDateTime.now())
         val line = buildString {
             append("$timestamp | $level | $tag | $msg")
@@ -45,9 +52,11 @@ object AppLogger {
             }
             append("\n")
         }
-        synchronized(lock) {
-            rotateIfNeeded(file)
-            file.appendText(line)
+        ioScope.launch {
+            synchronized(lock) {
+                rotateIfNeeded(file)
+                file.appendText(line)
+            }
         }
     }
 

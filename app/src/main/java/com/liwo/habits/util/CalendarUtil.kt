@@ -5,6 +5,7 @@ import java.time.LocalDate
 import java.time.YearMonth
 
 internal const val CALENDAR_CELL_COUNT = 42 // 6 weeks × 7 days
+internal const val CALENDAR_COLS = 7
 
 /**
  * Returns a list of exactly 42 dates (6 weeks x 7 days),

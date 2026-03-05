@@ -24,8 +24,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.liwo.habits.R
 import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyHabitItem
 import com.liwo.habits.ui.components.StatusSelector
@@ -35,11 +37,12 @@ import com.liwo.habits.vm.DashboardViewModel
 @Composable
 fun DashboardScreen() {
 
-    val vm: DashboardViewModel = viewModel()
+    val vm: DashboardViewModel = hiltViewModel()
     val state by vm.state.collectAsState()
 
     val isToday = state.selectedDate == DateUtil.today()
-    val dateLabel = if (isToday) "Today" else DateUtil.pretty(state.selectedDate)
+    val todayLabel = stringResource(R.string.nav_today)
+    val dateLabel = if (isToday) todayLabel else DateUtil.pretty(state.selectedDate)
 
     LazyColumn(
         modifier = Modifier
@@ -57,7 +60,7 @@ fun DashboardScreen() {
                 IconButton(onClick = { vm.prevDay() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Previous day"
+                        contentDescription = stringResource(R.string.nav_previous_day)
                     )
                 }
 
@@ -66,7 +69,7 @@ fun DashboardScreen() {
                     if (!isToday) {
                         Spacer(Modifier.padding(top = 4.dp))
                         OutlinedButton(onClick = { vm.goToday() }) {
-                            Text("Today")
+                            Text(stringResource(R.string.nav_today))
                         }
                     }
                 }
@@ -74,7 +77,7 @@ fun DashboardScreen() {
                 IconButton(onClick = { vm.nextDay() }) {
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Next day"
+                        contentDescription = stringResource(R.string.nav_next_day)
                     )
                 }
             }
@@ -92,7 +95,7 @@ fun DashboardScreen() {
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            "Current points",
+                            stringResource(R.string.label_current_points),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -109,7 +112,7 @@ fun DashboardScreen() {
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            "Total for the day",
+                            stringResource(R.string.label_total_for_day),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -125,7 +128,7 @@ fun DashboardScreen() {
         if (state.daily.habits.isEmpty()) {
             item {
                 Text(
-                    "No habits scheduled for this day.",
+                    stringResource(R.string.label_no_habits_scheduled),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -160,9 +163,9 @@ private fun HabitStatusCard(
 
             val subtitle =
                 when (item.status) {
-                    HabitStatus.DONE -> "Done (${fmtPoints(item.pointsDone)})"
-                    HabitStatus.MISSED -> "Missed (${fmtPoints(item.pointsMissed)})"
-                    HabitStatus.NONE -> "None"
+                    HabitStatus.DONE -> stringResource(R.string.habit_status_done, DateUtil.fmtPoints(item.pointsDone))
+                    HabitStatus.MISSED -> stringResource(R.string.habit_status_missed, DateUtil.fmtPoints(item.pointsMissed))
+                    HabitStatus.NONE -> stringResource(R.string.habit_status_none)
                 }
 
             Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -174,6 +177,3 @@ private fun HabitStatusCard(
         }
     }
 }
-
-private fun fmtPoints(p: Int): String =
-    if (p > 0) "+$p" else p.toString()

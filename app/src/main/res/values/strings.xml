@@ -1,3 +1,87 @@
 <resources>
     <string name="app_name">Habits</string>
+
+    <!-- Dashboard / Shared -->
+    <string name="nav_previous_day">Previous day</string>
+    <string name="nav_next_day">Next day</string>
+    <string name="nav_today">Today</string>
+    <string name="label_current_points">Current points</string>
+    <string name="label_total_for_day">Total for the day</string>
+    <string name="label_no_habits_scheduled">No habits scheduled for this day.</string>
+    <string name="habit_status_done">Done (%1$s)</string>
+    <string name="habit_status_missed">Missed (%1$s)</string>
+    <string name="habit_status_none">None</string>
+
+    <!-- Habits screen -->
+    <string name="cd_add_habit">Add habit</string>
+    <string name="label_no_habits_empty">No habits yet. Tap + to create one.</string>
+    <string name="cd_move_up">Up</string>
+    <string name="cd_move_down">Down</string>
+    <string name="cd_edit">Edit</string>
+    <string name="cd_delete">Delete</string>
+    <string name="dialog_add_habit">Add habit</string>
+    <string name="dialog_edit_habit">Edit habit</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="field_habit_name">Habit name</string>
+    <string name="field_points_done">Points when done</string>
+    <string name="field_points_missed">Points when missed</string>
+    <string name="label_active">Active</string>
+    <string name="label_available_days">Available days</string>
+    <string name="preset_every_day">Every day</string>
+    <string name="preset_weekdays">Weekdays</string>
+    <string name="preset_weekends">Weekends</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="day_sun">Sun</string>
+
+    <!-- Calendar screen -->
+    <string name="nav_previous_month">Previous month</string>
+    <string name="nav_next_month">Next month</string>
+    <string name="cd_close">Close</string>
+    <string name="label_done_missed">Done: %1$s  •  Missed: %2$s</string>
+
+    <!-- Rewards screen -->
+    <string name="label_points_available">Points available</string>
+    <string name="label_total_earned">Total earned</string>
+    <string name="label_rewards">Rewards</string>
+    <string name="label_history">History</string>
+    <string name="label_no_redemptions">No redemptions yet.</string>
+    <string name="label_recurring">Recurring</string>
+    <string name="label_single_redeem">Single redeem</string>
+    <string name="label_already_redeemed">Already redeemed</string>
+    <string name="label_need_more_points">Need %1$d more points</string>
+    <string name="label_unavailable">Unavailable</string>
+    <string name="cd_add_reward">Add reward</string>
+    <string name="cd_undo">Undo</string>
+    <string name="dialog_redeem_title">Redeem reward</string>
+    <string name="dialog_redeem_text">Spend %1$d points on \"%2$s\"?</string>
+    <string name="dialog_add_reward">Add reward</string>
+    <string name="dialog_edit_reward">Edit reward</string>
+    <string name="field_reward_name">Reward name</string>
+    <string name="field_reward_cost">Cost (points)</string>
+    <string name="field_reward_description">Description (optional)</string>
+    <string name="label_redeem_type">Redeem type</string>
+    <string name="btn_redeem">Redeem</string>
+    <string name="msg_redeemed">Redeemed: %1$s</string>
+    <string name="label_pts_mode">%1$d pts • %2$s</string>
+
+    <!-- Delete confirmation -->
+    <string name="dialog_delete_habit_title">Delete habit</string>
+    <string name="dialog_delete_habit_text">Delete \"%1$s\"? All history for this habit will also be removed.</string>
+    <string name="dialog_delete_reward_title">Delete reward</string>
+    <string name="dialog_delete_reward_text">Delete \"%1$s\"?</string>
+    <string name="btn_delete">Delete</string>
+
+    <!-- Settings screen -->
+    <string name="section_appearance">Appearance</string>
+    <string name="section_diagnostics">Diagnostics</string>
+    <string name="theme_dark_green">Dark (Green)</string>
+    <string name="theme_light_blue">Light (Blue)</string>
+    <string name="action_save_log">Save log to Downloads</string>
+    <string name="action_send_log">Send log by email</string>
 </resources>

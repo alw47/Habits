@@ -2,13 +2,16 @@ package com.liwo.habits.data.repo
 
 import androidx.room.withTransaction
 import com.liwo.habits.data.db.AppDatabase
+import javax.inject.Inject
+import javax.inject.Singleton
 import com.liwo.habits.data.model.Redemption
 import com.liwo.habits.data.model.Reward
 import com.liwo.habits.util.AppLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
-class RewardsRepository(private val db: AppDatabase) {
+@Singleton
+class RewardsRepository @Inject constructor(private val db: AppDatabase) {
 
     // Points = earned (from habits) - spent (from redemptions)
     fun observeRewardsState(): Flow<RewardsState> {
@@ -25,6 +28,7 @@ class RewardsRepository(private val db: AppDatabase) {
 
             // Clamp to Int range to avoid overflow crashes
             val available = availableLong.coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
+            val totalEarned = earnedLong.coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
 
             val redeemedRewardIds = history.asSequence().map { it.rewardId }.toSet()
 
@@ -42,7 +46,7 @@ class RewardsRepository(private val db: AppDatabase) {
                     )
                 }
 
-            RewardsState(pointsAvailable = available, rewards = rewardItems)
+            RewardsState(pointsAvailable = available, pointsEarned = totalEarned, rewards = rewardItems)
         }
     }
 
@@ -141,6 +145,7 @@ class RewardsRepository(private val db: AppDatabase) {
 
 data class RewardsState(
     val pointsAvailable: Int,
+    val pointsEarned: Int,
     val rewards: List<RewardItem>
 )
 

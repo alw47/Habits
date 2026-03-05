@@ -18,8 +18,8 @@ import com.liwo.habits.data.model.Reward
         Reward::class,
         Redemption::class
     ],
-    version = 1, // <-- bump this when schema changes
-    exportSchema = false
+    version = 1,
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
 
@@ -42,7 +42,6 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "habits.db"
                 )
-                    .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
                     .also { INSTANCE = it }
             }

@@ -46,6 +46,7 @@ hs_err_pid*
 *.keystore
 *.pem
 *.p12
+keystore.properties
 
 # === Firebase / Google services (optional: uncomment if you want to keep it private) ===
 # google-services.json

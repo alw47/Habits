@@ -40,15 +40,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.liwo.habits.R
 import com.liwo.habits.data.model.HabitLog
 import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.data.repo.DailyHabitItem
 import com.liwo.habits.ui.components.StatusSelector
+import com.liwo.habits.util.CALENDAR_CELL_COUNT
+import com.liwo.habits.util.CALENDAR_COLS
 import com.liwo.habits.util.DateUtil
 import com.liwo.habits.util.buildMonthGrid
 import com.liwo.habits.vm.CalendarViewModel
@@ -60,7 +64,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen() {
-    val vm: CalendarViewModel = viewModel()
+    val vm: CalendarViewModel = hiltViewModel()
 
     val visibleMonth by vm.visibleMonth.collectAsState()
     val selectedIso by vm.selectedDate.collectAsState()
@@ -74,6 +78,16 @@ fun CalendarScreen() {
 
     var showSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val dayHeaders = listOf(
+        stringResource(R.string.day_mon),
+        stringResource(R.string.day_tue),
+        stringResource(R.string.day_wed),
+        stringResource(R.string.day_thu),
+        stringResource(R.string.day_fri),
+        stringResource(R.string.day_sat),
+        stringResource(R.string.day_sun)
+    )
 
     Scaffold { padding ->
         Column(
@@ -96,7 +110,7 @@ fun CalendarScreen() {
                     IconButton(onClick = { vm.prevMonth() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Previous month"
+                            contentDescription = stringResource(R.string.nav_previous_month)
                         )
                     }
 
@@ -114,21 +128,21 @@ fun CalendarScreen() {
                         OutlinedButton(onClick = { vm.goToday() }) {
                             Icon(Icons.Filled.Today, null)
                             Spacer(Modifier.width(6.dp))
-                            Text("Today")
+                            Text(stringResource(R.string.nav_today))
                         }
                     }
 
                     IconButton(onClick = { vm.nextMonth() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = "Next month"
+                            contentDescription = stringResource(R.string.nav_next_month)
                         )
                     }
                 }
             }
 
             Row(Modifier.fillMaxWidth()) {
-                listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun").forEach {
+                dayHeaders.forEach {
                     Text(
                         text = it,
                         modifier = Modifier.weight(1f),
@@ -140,10 +154,10 @@ fun CalendarScreen() {
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                for (row in 0 until 6) {
+                for (row in 0 until CALENDAR_CELL_COUNT / CALENDAR_COLS) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        for (col in 0 until 7) {
-                            val idx = row * 7 + col
+                        for (col in 0 until CALENDAR_COLS) {
+                            val idx = row * CALENDAR_COLS + col
                             val day = days[idx]
                             val inMonth = (day.month == visibleMonth.month && day.year == visibleMonth.year)
 
@@ -178,7 +192,7 @@ fun CalendarScreen() {
 
             if (dailyState.habits.isEmpty()) {
                 Text(
-                    "No habits scheduled for this day.",
+                    stringResource(R.string.label_no_habits_scheduled),
                     modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -217,7 +231,7 @@ private fun SheetHeader(title: String, onClose: () -> Unit) {
             modifier = Modifier.weight(1f)
         )
         IconButton(onClick = onClose) {
-            Icon(Icons.Filled.Close, contentDescription = "Close")
+            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.cd_close))
         }
     }
 }
@@ -238,7 +252,11 @@ private fun HabitStatusCardInSheet(
             Text(item.name, style = MaterialTheme.typography.titleSmall)
 
             Text(
-                "Done: ${fmtPoints(item.pointsDone)}  •  Missed: ${fmtPoints(item.pointsMissed)}",
+                stringResource(
+                    R.string.label_done_missed,
+                    DateUtil.fmtPoints(item.pointsDone),
+                    DateUtil.fmtPoints(item.pointsMissed)
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -309,6 +327,3 @@ private fun DayCell(
         }
     }
 }
-
-private fun fmtPoints(p: Int): String =
-    if (p > 0) "+$p" else p.toString()

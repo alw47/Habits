@@ -1,6 +1,5 @@
 package com.liwo.habits.util
 
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -28,6 +27,5 @@ object DateUtil {
             .dayOfWeek
             .getDisplayName(TextStyle.FULL, Locale.getDefault())
 
-    fun mutableTodayState(): MutableStateFlow<String> =
-        MutableStateFlow(today())
+    fun fmtPoints(p: Int): String = if (p > 0) "+$p" else p.toString()
 }

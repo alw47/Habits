@@ -1,5 +1,6 @@
 package com.liwo.habits.data.repo
 
+import androidx.room.withTransaction
 import com.liwo.habits.data.db.AppDatabase
 import com.liwo.habits.data.model.Habit
 import com.liwo.habits.data.model.HabitLog
@@ -7,11 +8,26 @@ import com.liwo.habits.data.model.HabitStatus
 import com.liwo.habits.util.WeekdayMask
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class HabitRepository(private val db: AppDatabase) {
+@Singleton
+class HabitRepository @Inject constructor(private val db: AppDatabase) {
 
     fun observeHabits(): Flow<List<Habit>> =
         db.habitDao().observeAllHabits()
+
+    /** Earned points minus redeemed points, as a live Flow<Int>. */
+    fun observePointsAvailable(): Flow<Int> =
+        combine(
+            db.habitLogDao().observeTotalPointsEarned(),
+            db.redemptionDao().observeTotalSpent()
+        ) { earned, spent ->
+            (earned - spent).coerceIn(Int.MIN_VALUE.toLong(), Int.MAX_VALUE.toLong()).toInt()
+        }
+
+    fun observeLogsForDateRange(start: String, end: String): Flow<List<HabitLog>> =
+        db.habitLogDao().observeLogsForDateRange(start, end)
 
     fun observeDailyState(date: String): Flow<DailyState> {
         val habitsFlow = db.habitDao().observeActiveHabits()
@@ -68,8 +84,10 @@ class HabitRepository(private val db: AppDatabase) {
         db.habitDao().setActive(id, active)
 
     suspend fun swapSort(a: Habit, b: Habit) {
-        db.habitDao().upsertHabit(a.copy(sortOrder = b.sortOrder))
-        db.habitDao().upsertHabit(b.copy(sortOrder = a.sortOrder))
+        db.withTransaction {
+            db.habitDao().upsertHabit(a.copy(sortOrder = b.sortOrder))
+            db.habitDao().upsertHabit(b.copy(sortOrder = a.sortOrder))
+        }
     }
 
     suspend fun setStatus(habitId: Long, date: String, status: HabitStatus) {

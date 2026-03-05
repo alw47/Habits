@@ -1,6 +1,5 @@
 package com.liwo.habits.vm
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -8,9 +7,11 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.content.ContentValues
 import androidx.core.content.FileProvider
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.liwo.habits.util.AppLogger
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,13 +19,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDate
+import javax.inject.Inject
 
 sealed interface ExportState {
     data class Success(val message: String) : ExportState
     data class Error(val message: String) : ExportState
 }
 
-class SettingsViewModel(app: Application) : AndroidViewModel(app) {
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
     private val _exportState = MutableStateFlow<ExportState?>(null)
     val exportState: StateFlow<ExportState?> = _exportState
@@ -32,7 +37,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     fun exportToDownloads() {
         viewModelScope.launch {
             val result = withContext(Dispatchers.IO) {
-                runCatching { saveToDownloads(getApplication()) }
+                runCatching { saveToDownloads(context) }
             }
             _exportState.value = result.fold(
                 onSuccess = { path -> ExportState.Success("Saved to $path") },
@@ -43,14 +48,13 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun buildShareIntent(): Intent? {
         return runCatching {
-            val ctx: Context = getApplication()
             val content = AppLogger.readAll()
             if (content.isBlank()) return null
 
-            val cacheFile = File(ctx.cacheDir, "habits_log.txt")
+            val cacheFile = File(context.cacheDir, "habits_log.txt")
             cacheFile.writeText(content)
 
-            val uri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", cacheFile)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", cacheFile)
 
             Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
