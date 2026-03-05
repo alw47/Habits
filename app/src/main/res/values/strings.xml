@@ -79,9 +79,22 @@
 
     <!-- Settings screen -->
     <string name="section_appearance">Appearance</string>
+    <string name="section_data">Data</string>
     <string name="section_diagnostics">Diagnostics</string>
     <string name="theme_dark_green">Dark (Green)</string>
     <string name="theme_light_blue">Light (Blue)</string>
+    <string name="action_export_backup">Export backup</string>
+    <string name="action_import_backup">Import backup</string>
+    <string name="action_clear_data">Clear all data</string>
+    <string name="dialog_import_title">Restore from backup?</string>
+    <string name="dialog_import_text">This will replace all your current data with the backup. This cannot be undone.</string>
+    <string name="btn_restore">Restore</string>
+    <string name="dialog_clear_title_1">Clear all data?</string>
+    <string name="dialog_clear_text_1">This will permanently delete all your habits, logs, rewards, and redemptions. This action cannot be undone.</string>
+    <string name="dialog_clear_title_2">Are you absolutely sure?</string>
+    <string name="dialog_clear_text_2">All data will be gone forever. There is no way to recover it unless you have a backup.</string>
+    <string name="btn_continue">Continue</string>
+    <string name="btn_clear_all">Clear all data</string>
     <string name="action_save_log">Save log to Downloads</string>
     <string name="action_send_log">Send log by email</string>
 </resources>

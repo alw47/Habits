@@ -39,7 +39,10 @@ fun HabitsScreen() {
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { vm.openAdd() }) {
+            FloatingActionButton(
+                onClick = { vm.openAdd() },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_add_habit))
             }
         }

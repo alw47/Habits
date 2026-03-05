@@ -22,6 +22,15 @@ interface HabitLogDao {
     @Query("DELETE FROM habit_logs WHERE habitId = :habitId AND date = :date")
     suspend fun deleteLog(habitId: Long, date: String)
 
+    @Query("SELECT * FROM habit_logs")
+    suspend fun getAllLogs(): List<HabitLog>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(logs: List<HabitLog>)
+
+    @Query("DELETE FROM habit_logs")
+    suspend fun deleteAll()
+
     /**
      * Total earned points across all logged days.
      *

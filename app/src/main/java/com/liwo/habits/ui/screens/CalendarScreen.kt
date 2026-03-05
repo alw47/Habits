@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -153,9 +152,15 @@ fun CalendarScreen() {
                 }
             }
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 for (row in 0 until CALENDAR_CELL_COUNT / CALENDAR_COLS) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         for (col in 0 until CALENDAR_COLS) {
                             val idx = row * CALENDAR_COLS + col
                             val day = days[idx]
@@ -305,7 +310,7 @@ private fun DayCell(
 
     Box(
         modifier = modifier
-            .aspectRatio(1f)
+            .fillMaxSize()
             .background(bgColor, shape)
             .semantics { contentDescription = dateLabel }
             .clickable { onClick() }

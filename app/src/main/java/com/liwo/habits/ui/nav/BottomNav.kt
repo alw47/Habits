@@ -13,7 +13,7 @@ sealed class BottomDest(
     val label: String,
     val icon: ImageVector
 ) {
-    data object Dashboard : BottomDest("dashboard", "Dashboard", Icons.Filled.Home)
+    data object Dashboard : BottomDest("dashboard", "Home", Icons.Filled.Home)
     data object Habits : BottomDest("habits", "Habits", Icons.Filled.Checklist)
     data object Rewards : BottomDest("rewards", "Rewards", Icons.Filled.CardGiftcard)
     data object Calendar : BottomDest("calendar", "Calendar", Icons.Filled.CalendarMonth)

@@ -28,4 +28,13 @@ interface RewardDao {
 
     @Query("UPDATE rewards SET isActive = :active WHERE id = :id")
     suspend fun setActive(id: Long, active: Boolean)
+
+    @Query("SELECT * FROM rewards")
+    suspend fun getAllRewards(): List<Reward>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(rewards: List<Reward>)
+
+    @Query("DELETE FROM rewards")
+    suspend fun deleteAll()
 }

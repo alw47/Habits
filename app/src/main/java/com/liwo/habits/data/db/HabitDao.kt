@@ -27,4 +27,13 @@ interface HabitDao {
 
     @Query("SELECT COUNT(*) FROM habits")
     suspend fun countHabits(): Int
+
+    @Query("SELECT * FROM habits")
+    suspend fun getAllHabits(): List<Habit>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(habits: List<Habit>)
+
+    @Query("DELETE FROM habits")
+    suspend fun deleteAll()
 }

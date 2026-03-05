@@ -2,6 +2,7 @@ package com.liwo.habits.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.liwo.habits.data.model.Redemption
 import kotlinx.coroutines.flow.Flow
@@ -26,4 +27,13 @@ interface RedemptionDao {
 
     @Query("DELETE FROM redemptions WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("SELECT * FROM redemptions")
+    suspend fun getAllRedemptions(): List<Redemption>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(redemptions: List<Redemption>)
+
+    @Query("DELETE FROM redemptions")
+    suspend fun deleteAll()
 }

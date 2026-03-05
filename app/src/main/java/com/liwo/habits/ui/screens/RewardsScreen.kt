@@ -48,7 +48,10 @@ fun RewardsScreen() {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAdd = true }) {
+            FloatingActionButton(
+                onClick = { showAdd = true },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.cd_add_reward))
             }
         }

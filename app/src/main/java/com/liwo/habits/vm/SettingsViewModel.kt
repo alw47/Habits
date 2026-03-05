@@ -2,6 +2,7 @@ package com.liwo.habits.vm
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -9,6 +10,7 @@ import android.content.ContentValues
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.liwo.habits.data.repo.BackupRepository
 import com.liwo.habits.util.AppLogger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,7 +30,8 @@ sealed interface ExportState {
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val backupRepository: BackupRepository
 ) : ViewModel() {
 
     private val _exportState = MutableStateFlow<ExportState?>(null)
@@ -65,6 +68,42 @@ class SettingsViewModel @Inject constructor(
         }.getOrElse {
             AppLogger.e("SettingsVM", "Failed to build share intent", it)
             null
+        }
+    }
+
+    fun exportBackup() {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching { backupRepository.exportToDownloads() }
+            }
+            _exportState.value = result.fold(
+                onSuccess = { path -> ExportState.Success("Backup saved to $path") },
+                onFailure = { e -> ExportState.Error(e.message ?: "Export failed") }
+            )
+        }
+    }
+
+    fun clearDatabase() {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching { backupRepository.clearAll() }
+            }
+            _exportState.value = result.fold(
+                onSuccess = { ExportState.Success("All data cleared") },
+                onFailure = { e -> ExportState.Error(e.message ?: "Clear failed") }
+            )
+        }
+    }
+
+    fun importBackup(uri: Uri) {
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                runCatching { backupRepository.importFromUri(uri) }
+            }
+            _exportState.value = result.fold(
+                onSuccess = { ExportState.Success("Data restored successfully") },
+                onFailure = { e -> ExportState.Error(e.message ?: "Import failed") }
+            )
         }
     }
 
